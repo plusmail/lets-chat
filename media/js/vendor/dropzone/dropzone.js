@@ -105,9 +105,9 @@
 
     /*
     This is a list of all available events you can register on a dropzone object.
-    
+
     You can register an event handler like this:
-    
+
         dropzone.on("dragEnter", function() { });
      */
 
@@ -431,7 +431,7 @@
         this.options.url = this.element.getAttribute("action");
       }
       if (!this.options.url) {
-        throw new Error("No URL provided.");
+        throw new Error("No URL provided1111.");
       }
       if (this.options.acceptedFiles && this.options.acceptedMimeTypes) {
         throw new Error("You can't provide both 'acceptedFiles' and 'acceptedMimeTypes'. 'acceptedMimeTypes' is deprecated.");
@@ -1608,7 +1608,7 @@
 
 
   /*
-  
+
   Bugfix for iOS 6 and 7
   Source: http://stackoverflow.com/questions/11929099/html5-canvas-drawimage-ratio-bug-ios
   based on the work of https://github.com/stomita/ios-imagefile-megapixel

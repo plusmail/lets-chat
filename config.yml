@@ -31,7 +31,7 @@ xmpp:
     cert: ./rootca.crt
 
 database:
-  uri: mongodb://localhost/letschat
+  uri: 'mongodb://localhost/letschat'
 
 secrets:
   cookie: secretsauce

@@ -1,6 +1,6 @@
 'use strict';
 
-var fs = require('fs'),
+let fs = require('fs'),
     path = require('path');
 
 function LocalFiles(options) {
@@ -15,7 +15,7 @@ LocalFiles.prototype.getUrl = function(file) {
 };
 
 LocalFiles.prototype.save = function(options, callback) {
-    var file = options.file,
+    let file = options.file,
         doc = options.doc,
         fileFolder = doc._id,
         filePath = fileFolder + '/' + encodeURIComponent(doc.name),
@@ -28,7 +28,7 @@ LocalFiles.prototype.save = function(options, callback) {
         }
 
         // Let the clients know about the new file
-        var url = '/files/' + filePath;
+        let url = '/files/' + filePath;
         callback(null, url, doc);
     });
 };

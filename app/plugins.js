@@ -9,6 +9,7 @@ function PluginManager() {
 
 PluginManager.prototype.getPlugin = function(key, type) {
     var name = 'lets-chat-' + key;
+    console.log("PluginManager->", name);
     var plugin = require(name);
 
     if (!type) {

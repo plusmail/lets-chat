@@ -34,6 +34,9 @@ var FileSchema = new Schema({
     }
 });
 
+//API
+// virtual, method, pre
+
 FileSchema.virtual('url').get(function() {
     return 'files/' + this._id + '/' + encodeURIComponent(this.name);
 });

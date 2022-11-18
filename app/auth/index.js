@@ -1,6 +1,7 @@
 'use strict';
+const config = require('config-yml').load('development')
 
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
     cookieParser = require('cookie-parser'),
     mongoose = require('mongoose'),
@@ -11,14 +12,14 @@ var _ = require('lodash'),
     settings = require('./../config'),
     plugins = require('./../plugins');
 
-var providerSettings = {},
+let providerSettings = {},
     MAX_AUTH_DELAY_TIME = 24 * 60 * 60 * 1000,
     loginAttempts = {},
     enabledProviders = [];
 
 function getProviders(core) {
-    return settings.auth.providers.map(function(key) {
-        var Provider;
+    return config.auth.providers.map(function(key) {
+        let Provider;
 
         if (key === 'local') {
             Provider = require('./local');
@@ -28,7 +29,7 @@ function getProviders(core) {
 
         return {
             key: key,
-            provider: new Provider(settings.auth[key], core)
+            provider: new Provider(config.auth[key], core)
         };
     });
 }
@@ -47,7 +48,7 @@ function setup(app, session, core) {
             done = password;
         }
 
-        var User = mongoose.model('User');
+        let User = mongoose.model('User');
         User.findByToken(username, function(err, user) {
             if (err) { return done(err); }
             if (!user) { return done(null, false); }
@@ -63,7 +64,7 @@ function setup(app, session, core) {
     });
 
     passport.deserializeUser(function(id, done) {
-        var User = mongoose.model('User');
+        let User = mongoose.model('User');
         User.findOne({ _id: id }, function(err, user) {
             done(err, user);
         });
@@ -100,8 +101,8 @@ function setup(app, session, core) {
 }
 
 function checkIfAccountLocked(username, cb) {
-    var attempt = loginAttempts[username];
-    var isLocked = attempt &&
+    let attempt = loginAttempts[username];
+    let isLocked = attempt &&
                    attempt.lockedUntil &&
                    attempt.lockedUntil > Date.now();
 
@@ -123,7 +124,7 @@ function wrapAuthCallback(username, cb) {
 
             attempt.attempts++;
 
-            if (attempt.attempts >= settings.auth.throttling.threshold) {
+            if (attempt.attempts >= config.auth.throttling.threshold) {
                 var lock = Math.min(5000 * Math.pow(2, (attempt.attempts - settings.auth.throttling.threshold), MAX_AUTH_DELAY_TIME));
                 attempt.lockedUntil = Date.now() + lock;
                 return cb(err, user, {
@@ -145,7 +146,7 @@ function wrapAuthCallback(username, cb) {
 }
 
 function authenticate() {
-    var req, username, cb;
+    let req, username, cb;
 
     if (arguments.length === 4) {
         username = arguments[1];
@@ -191,16 +192,16 @@ function authenticate() {
             });
         }
 
-        if (settings.auth.throttling &&
-            settings.auth.throttling.enable) {
+        if (config.auth.throttling &&
+            config.auth.throttling.enable) {
             cb = wrapAuthCallback(username, cb);
         }
 
-        var series = enabledProviders.map(function(p) {
-            var provider = p.provider;
+        let series = enabledProviders.map(function(p) {
+            let provider = p.provider;
             return function() {
-                var args = Array.prototype.slice.call(arguments);
-                var callback = args.slice(args.length - 1)[0];
+                let args = Array.prototype.slice.call(arguments);
+                let callback = args.slice(args.length - 1)[0];
 
                 if (args.length > 1 && args[0]) {
                     return callback(null, args[0]);

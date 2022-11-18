@@ -31,13 +31,13 @@ xmpp:
     cert: ./rootca.crt
 
 database:
-  uri: mongodb://localhost/letschat
+  uri: 'mongodb://localhost/letschat'
 
 secrets:
   cookie: secretsauce
 
 files:
-  enable: true
+  enable: false
   provider: local
   maxFileSize: 100000000
   restrictTypes: true

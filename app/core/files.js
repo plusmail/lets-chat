@@ -1,12 +1,11 @@
 'use strict';
-
-var _ = require('lodash'),
+const config = require('config-yml').load('development')
+let _ = require('lodash'),
     mongoose = require('mongoose'),
     helpers = require('./helpers'),
-    plugins = require('./../plugins'),
-    settings = require('./../config').files;
+    plugins = require('./../plugins');
 
-var enabled = settings.enable;
+let enabled = config.files.enable;
 
 function FileManager(options) {
     this.core = options.core;
@@ -15,35 +14,29 @@ function FileManager(options) {
         return;
     }
 
-    var Provider;
+    let Provider;
 
-    if (settings.provider === 'local') {
+    if (config.files.provider === 'local') {
         Provider = require('./files/local');
     } else {
-        Provider = plugins.getPlugin(settings.provider, 'files');
+        Provider = plugins.getPlugin(config.files.provider, 'files');
     }
 
-    this.provider = new Provider(settings[settings.provider]);
+    this.provider = new Provider(config.files[config.files.provider]);
 }
 
-FileManager.prototype.create = function(options, cb) {
+FileManager.prototype.create = function (options, cb) {
     if (!enabled) {
         return cb('Files are disabled.');
     }
 
-    var File = mongoose.model('File'),
-        Room = mongoose.model('Room'),
-        User = mongoose.model('User');
+    let File = mongoose.model('File'), Room = mongoose.model('Room'), User = mongoose.model('User');
 
-    if (settings.restrictTypes &&
-        settings.allowedTypes &&
-        settings.allowedTypes.length &&
-        !_.includes(settings.allowedTypes, options.file.mimetype)) {
-            return cb('The MIME type ' + options.file.mimetype +
-                      ' is not allowed');
+    if (config.files.restrictTypes && config.files.allowedTypes && config.files.allowedTypes.length && !_.includes(config.files.allowedTypes, options.file.mimetype)) {
+        return cb('The MIME type ' + options.file.mimetype + ' is not allowed');
     }
 
-    Room.findById(options.room, function(err, room) {
+    Room.findById(options.room, function (err, room) {
 
         if (err) {
             console.error(err);
@@ -65,19 +58,19 @@ FileManager.prototype.create = function(options, cb) {
             type: options.file.mimetype,
             size: options.file.size,
             room: options.room
-        }).save(function(err, savedFile) {
+        }).save(function (err, savedFile) {
             if (err) {
                 return cb(err);
             }
 
-            this.provider.save({file: options.file, doc: savedFile}, function(err) {
+            this.provider.save({file: options.file, doc: savedFile}, function (err) {
                 if (err) {
                     savedFile.remove();
                     return cb(err);
                 }
 
                 // Temporary workaround for _id until populate can do aliasing
-                User.findOne(options.owner, function(err, user) {
+                User.findByIdentifier(options.owner, function (err, user) {
                     if (err) {
                         console.error(err);
                         return cb(err);
@@ -87,11 +80,10 @@ FileManager.prototype.create = function(options, cb) {
 
                     this.core.emit('files:new', savedFile, room, user);
 
+
                     if (options.post) {
                         this.core.messages.create({
-                            room: room,
-                            owner: user.id,
-                            text: 'upload://' + savedFile.url
+                            room: room, owner: user.id, text: 'upload://' + savedFile.url
                         });
                     }
                 }.bind(this));
@@ -100,8 +92,8 @@ FileManager.prototype.create = function(options, cb) {
     }.bind(this));
 };
 
-FileManager.prototype.list = function(options, cb) {
-    var Room = mongoose.model('Room');
+FileManager.prototype.list = function (options, cb) {
+    let Room = mongoose.model('Room');
 
     if (!enabled) {
         return cb(null, []);
@@ -115,15 +107,13 @@ FileManager.prototype.list = function(options, cb) {
 
     options = helpers.sanitizeQuery(options, {
         defaults: {
-            reverse: true,
-            take: 500
-        },
-        maxTake: 5000
+            reverse: true, take: 500
+        }, maxTake: 5000
     });
 
-    var File = mongoose.model('File');
+    let File = mongoose.model('File');
 
-    var find = File.find({
+    let find = File.find({
         room: options.room
     });
 
@@ -136,7 +126,7 @@ FileManager.prototype.list = function(options, cb) {
     }
 
     if (options.expand) {
-        var includes = options.expand.replace(/\s/, '').split(',');
+        let includes = options.expand.replace(/\s/, '').split(',');
 
         if (_.includes(includes, 'owner')) {
             find.populate('owner', 'id username displayName email avatar');
@@ -148,23 +138,22 @@ FileManager.prototype.list = function(options, cb) {
     }
 
     if (options.reverse) {
-        find.sort({ 'uploaded': -1 });
+        find.sort({'uploaded': -1});
     } else {
-        find.sort({ 'uploaded': 1 });
+        find.sort({'uploaded': 1});
     }
 
-    Room.findById(options.room, function(err, room) {
+    Room.findById(options.room, function (err, room) {
         if (err) {
             console.error(err);
             return cb(err);
         }
 
-        var opts = {
-            userId: options.userId,
-            password: options.password
+        let opts = {
+            userId: options.userId, password: options.password
         };
 
-        room.canJoin(opts, function(err, canJoin) {
+        room.canJoin(opts, function (err, canJoin) {
             if (err) {
                 console.error(err);
                 return cb(err);
@@ -176,7 +165,7 @@ FileManager.prototype.list = function(options, cb) {
 
             find
                 .limit(options.take)
-                .exec(function(err, files) {
+                .exec(function (err, files) {
                     if (err) {
                         console.error(err);
                         return cb(err);
@@ -187,7 +176,7 @@ FileManager.prototype.list = function(options, cb) {
     });
 };
 
-FileManager.prototype.getUrl = function(file) {
+FileManager.prototype.getUrl = function (file) {
     if (!enabled) {
         return;
     }

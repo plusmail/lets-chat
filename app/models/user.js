@@ -88,7 +88,7 @@ var UserSchema = new mongoose.Schema({
     },
     rooms: [{
 		type: ObjectId,
-		ref: 'Room' 
+		ref: 'Room'
     }],
     openRooms: [{
       		type: String,
@@ -136,7 +136,7 @@ UserSchema.pre('save', function(next) {
 UserSchema.statics.findByIdentifier = function(identifier, cb) {
     var opts = {};
 
-    if (identifier.match(/^[0-9a-fA-F]{24}$/)) {
+    if (identifier.toString().match(/^[0-9a-fA-F]{24}$/)) {
         opts.$or = [{_id: identifier}, {username: identifier}];
     } else if (identifier.indexOf('@') === -1) {
         opts.username = identifier;

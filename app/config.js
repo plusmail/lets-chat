@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('lodash'),
+const _ = require('lodash'),
     fs = require('fs'),
     yaml = require('js-yaml'),
     plugins = require('./plugins');
@@ -26,15 +26,15 @@ function parseEnvValue(value, isArray) {
     return value;
 }
 
-var pipeline = [
+const pipeline = [
 
     function getDefaultSettings(context) {
-        var file = fs.readFileSync('defaults.yml', 'utf8');
+        let file = fs.readFileSync('defaults.yml', 'utf8');
         context.defaults = yaml.safeLoad(file);
     },
 
     function getFileSettings(context) {
-        var file;
+        let file;
         if (fs.existsSync('config/settings.yml')) {
             file = fs.readFileSync('config/settings.yml', 'utf8');
             context.file = yaml.safeLoad(file) || {};
@@ -47,7 +47,7 @@ var pipeline = [
     },
 
     function getFilePlugin(context) {
-        var provider = process.env.LCB_FILES_PROVIDER ||
+        const provider = process.env.LCB_FILES_PROVIDER ||
                       context.file.files && context.file.files.provider ||
                       context.defaults.files && context.defaults.files.provider;
 
@@ -55,8 +55,8 @@ var pipeline = [
     },
 
     function getAuthPlugins(context) {
-        var providers = [];
-        var env = process.env.LCB_AUTH_PROVIDERS;
+        let providers = [];
+        const env = process.env.LCB_AUTH_PROVIDERS;
         if (env) {
             providers = parseEnvValue(env, true);
         } else {
@@ -73,7 +73,7 @@ var pipeline = [
                 return;
             }
 
-            var plugin = plugins.getPlugin(key, 'files');
+            let plugin = plugins.getPlugin(key, 'files');
 
             if (!plugin || !plugin.defaults) {
                 return;
@@ -89,7 +89,7 @@ var pipeline = [
                 return;
             }
 
-            var plugin = plugins.getPlugin(key, 'auth');
+            let plugin = plugins.getPlugin(key, 'auth');
 
             if (!plugin || !plugin.defaults) {
                 return;
@@ -106,12 +106,12 @@ var pipeline = [
     function mergeEnvSettings(context) {
         function recurse(baseKey, object) {
             _.forEach(object, function(value, key) {
-                var envKey = baseKey + '_' +
+                let envKey = baseKey + '_' +
                              key.replace(/([A-Z]+)/g, '_$1').toUpperCase();
                 if (_.isPlainObject(value)) {
                     recurse(envKey, value);
                 } else {
-                    var val = process.env[envKey];
+                    let val = process.env[envKey];
                     if (val) {
                         object[key] = parseEnvValue(val,
                                                     _.isArray(object[key]));
@@ -172,7 +172,7 @@ var pipeline = [
     }
 ];
 
-var context = {
+const context = {
     plugins: {},
     export: {}
 };

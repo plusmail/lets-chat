@@ -1,13 +1,13 @@
 'use strict';
 
-var xmpp = require('node-xmpp-server'),
+const xmpp = require('node-xmpp-server'),
     IQ = xmpp.IQ,
     settings = require('./../config'),
     auth = require('./../auth/index'),
     all = require('require-tree'),
     XmppConnection = require('./xmpp-connection');
 
-var allArray = function(path) {
+const allArray = function(path) {
         var modules = all(path);
         return Object.keys(modules).map(function(key) {
             return modules[key];
@@ -29,12 +29,12 @@ function xmppStart(core) {
         };
     }
 
-    var c2s = new xmpp.C2SServer(options);
+    const c2s = new xmpp.C2SServer(options);
 
     c2s.on('connect', function(client) {
 
         client.on('authenticate', function(opts, cb) {
-            var username = settings.xmpp.username === 'full' ?
+            let username = settings.xmpp.username === 'full' ?
                            opts.jid.toString() : opts.jid.local;
 
             auth.authenticate(username, opts.password, function(err, user) {
@@ -45,7 +45,7 @@ function xmppStart(core) {
                 // TODO: remove?
                 client.user = user;
 
-                var conn = new XmppConnection(user, client, opts.jid);
+                let conn = new XmppConnection(user, client, opts.jid);
                 core.presence.connect(conn);
 
                 cb(null, opts);
@@ -103,7 +103,7 @@ function xmppStart(core) {
     });
 
     eventListeners.forEach(function(EventListener) {
-        var listener = new EventListener(core);
+        let listener = new EventListener(core);
         core.on(listener.on, listener.then);
     });
 }

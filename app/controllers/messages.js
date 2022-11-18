@@ -6,12 +6,12 @@
 
 module.exports = function() {
 
-    var app = this.app,
+    let app = this.app,
         core = this.core,
         middlewares = this.middlewares;
 
     core.on('messages:new', function(message, room, user) {
-        var msg = message.toJSON();
+        let msg = message.toJSON();
         msg.owner = user;
         msg.room = room.toJSON(user);
 
@@ -45,7 +45,7 @@ module.exports = function() {
     //
     app.io.route('messages', {
         create: function(req, res) {
-            var options = {
+            let options = {
                     owner: req.user._id,
                     room: req.param('room'),
                     text: req.param('text')
@@ -59,7 +59,7 @@ module.exports = function() {
             });
         },
         list: function(req, res) {
-            var options = {
+            let options = {
                     userId: req.user._id,
                     password: req.param('password'),
 

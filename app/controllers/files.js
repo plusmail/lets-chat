@@ -3,23 +3,21 @@
 //
 
 'use strict';
-
-var multer = require('multer'),
-    settings = require('./../config').files;
+const config = require('config-yml').load('development')
+const multer = require('multer');
 
 module.exports = function() {
-
-    if (!settings.enable) {
+    if (!config.files.enable) {
         return;
     }
 
-    var app = this.app,
+    let app = this.app,
         core = this.core,
         middlewares = this.middlewares,
         models = this.models;
 
     core.on('files:new', function(file, room, user) {
-        var fil = file.toJSON();
+        let fil = file.toJSON();
         fil.owner = user;
         fil.room = room.toJSON(user);
 
@@ -27,10 +25,10 @@ module.exports = function() {
               .emit('files:new', fil);
     });
 
-    var fileUpload = multer({
+    let fileUpload = multer({
         limits: {
             files: 1,
-            fileSize: settings.maxFileSize
+            fileSize: config.files.maxFileSize
         },
         storage: multer.diskStorage({})
     }).any();
@@ -69,15 +67,15 @@ module.exports = function() {
                     return res.send(404);
                 }
 
-                var isImage = [
+                let isImage = [
                   'image/jpeg',
                   'image/png',
                   'image/gif'
                 ].indexOf(file.type) > -1;
 
-                var url = core.files.getUrl(file);
+                let url = core.files.getUrl(file);
 
-                if (settings.provider === 'local') {
+                if (config.files.provider === 'local') {
                     res.sendFile(url, {
                         headers: {
                             'Content-Type': file.type,
@@ -100,7 +98,7 @@ module.exports = function() {
                 return res.sendStatus(400);
             }
 
-            var options = {
+            let options = {
                     owner: req.user._id,
                     room: req.param('room'),
                     file: req.files[0],
@@ -116,7 +114,7 @@ module.exports = function() {
             });
         },
         list: function(req, res) {
-            var options = {
+            let options = {
                     userId: req.user._id,
                     password: req.param('password'),
 

@@ -1,37 +1,54 @@
 'use strict';
 
-var util = require('util'),
-    Connection = require('./../core/presence').Connection;
+const util = require('util');
+const Connection = require('./../core/presence/connection');
 
-function SocketIoConnection(user, socket) {
-    Connection.call(this, 'socket.io', user);
-    this.socket = socket;
-    socket.conn = this;
-    socket.on('disconnect', this.disconnect.bind(this));
+class SocketIoConnection extends Connection{
+    constructor(user, socket) {
+        super('socket.io', user);
+        this.socket = socket;
+        socket.conn = this;
+        socket.on('disconnect', this.disconnect.bind(this));
+    }
+
+    disconnect() {
+        this.emit('disconnect');
+
+        this.socket.conn = null;
+        this.socket = null;
+    };
 }
-
-util.inherits(SocketIoConnection, Connection);
-
-SocketIoConnection.prototype.disconnect = function() {
-    this.emit('disconnect');
-
-    this.socket.conn = null;
-    this.socket = null;
-};
+//
+// function SocketIoConnection(user, socket) {
+//     const connect = new Connection(this, 'socket.io', user);
+//     this.socket = socket;
+//     socket.conn = this;
+//     socket.on('disconnect', this.disconnect.bind(this));
+// }
+//
+// util.inherits(SocketIoConnection, Connection);
+//
+// SocketIoConnection.prototype.disconnect = function() {
+//     this.emit('disconnect');
+//
+//     this.socket.conn = null;
+//     this.socket = null;
+// };
 
 module.exports = function() {
-    var app = this.app,
+    let app = this.app,
         core = this.core,
         User = this.models.user;
 
     app.io.on('connection', function(socket) {
-        var userId = socket.request.user._id;
+        let userId = socket.request.user._id;
         User.findById(userId, function (err, user) {
             if (err) {
                 console.error(err);
                 return;
             }
-            var conn = new SocketIoConnection(user, socket);
+            let conn = new SocketIoConnection(user, socket);
+            console.log("5555555555->", conn);
             core.presence.connect(conn);
         });
     });
