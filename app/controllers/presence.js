@@ -48,7 +48,6 @@ module.exports = function() {
                 return;
             }
             let conn = new SocketIoConnection(user, socket);
-            console.log("5555555555->", conn);
             core.presence.connect(conn);
         });
     });

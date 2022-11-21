@@ -3,11 +3,10 @@
 //
 
 'use strict';
-
-var settings = require('./../config').rooms;
+const config = require('config-yml').load('development')
 
 module.exports = function() {
-    var app = this.app,
+    let app = this.app,
         core = this.core,
         middlewares = this.middlewares,
         models = this.models,
@@ -41,9 +40,9 @@ module.exports = function() {
         });
     });
 
-    var getEmitters = function(room) {
+    const getEmitters = function (room){
         if (room.private && !room.hasPassword) {
-            var connections = core.presence.connections.query({
+            let connections = core.presence.connections.query({
                 type: 'socket.io'
             }).filter(function(connection) {
                 return room.isAuthorized(connection.user);
@@ -63,21 +62,21 @@ module.exports = function() {
     };
 
     core.on('rooms:new', function(room) {
-        var emitters = getEmitters(room);
+        let emitters = getEmitters(room);
         emitters.forEach(function(e) {
             e.emitter.emit('rooms:new', room.toJSON(e.user));
         });
     });
 
     core.on('rooms:update', function(room) {
-        var emitters = getEmitters(room);
+        let emitters = getEmitters(room);
         emitters.forEach(function(e) {
             e.emitter.emit('rooms:update', room.toJSON(e.user));
         });
     });
 
     core.on('rooms:archive', function(room) {
-        var emitters = getEmitters(room);
+        let emitters = getEmitters(room);
         emitters.forEach(function(e) {
             e.emitter.emit('rooms:archive', room.toJSON(e.user));
         });
@@ -120,7 +119,7 @@ module.exports = function() {
     //
     app.io.route('rooms', {
         list: function(req, res) {
-            var options = {
+            let options = {
                     userId: req.user._id,
                     users: req.param('users'),
 
@@ -134,7 +133,7 @@ module.exports = function() {
                     return res.status(400).json(err);
                 }
 
-                var results = rooms.map(function(room) {
+                let results = rooms.map(function(room) {
                     return room.toJSON(req.user);
                 });
 
@@ -142,7 +141,7 @@ module.exports = function() {
             });
         },
         get: function(req, res) {
-            var options = {
+            let options = {
                 userId: req.user._id,
                 identifier: req.param('room') || req.param('id')
             };
@@ -161,7 +160,7 @@ module.exports = function() {
             });
         },
         create: function(req, res) {
-            var options = {
+            let options = {
                 owner: req.user._id,
                 name: req.param('name'),
                 slug: req.param('slug'),
@@ -170,7 +169,7 @@ module.exports = function() {
                 password: req.param('password')
             };
 
-            if (!settings.private) {
+            if (!config.rooms.private) {
                 options.private = false;
                 delete options.password;
             }
@@ -185,9 +184,9 @@ module.exports = function() {
             });
         },
         update: function(req, res) {
-            var roomId = req.param('room') || req.param('id');
+            let roomId = req.param('room') || req.param('id');
 
-            var options = {
+            let options = {
                     name: req.param('name'),
                     slug: req.param('slug'),
                     description: req.param('description'),
@@ -196,7 +195,7 @@ module.exports = function() {
                     user: req.user
                 };
 
-            if (!settings.private) {
+            if (!config.rooms.private) {
                 delete options.password;
                 delete options.participants;
             }
@@ -215,7 +214,7 @@ module.exports = function() {
             });
         },
         archive: function(req, res) {
-            var roomId = req.param('room') || req.param('id');
+            let roomId = req.param('room') || req.param('id');
 
             core.rooms.archive(roomId, function(err, room) {
                 if (err) {
@@ -231,7 +230,7 @@ module.exports = function() {
             });
         },
         join: function(req, res) {
-            var options = {
+            let options = {
                     userId: req.user._id,
                     saveMembership: true
                 };
@@ -266,7 +265,7 @@ module.exports = function() {
                     return res.sendStatus(404);
                 }
 
-                var user = req.user.toJSON();
+                let user = req.user.toJSON();
                 user.room = room._id;
 
                 core.presence.join(req.socket.conn, room);
@@ -275,8 +274,8 @@ module.exports = function() {
             });
         },
         leave: function(req, res) {
-            var roomId = req.data;
-            var user = req.user.toJSON();
+            let roomId = req.data;
+            let user = req.user.toJSON();
             user.room = roomId;
 
             core.presence.leave(req.socket.conn, roomId);
@@ -284,7 +283,7 @@ module.exports = function() {
             res.json();
         },
         users: function(req, res) {
-            var roomId = req.param('room');
+            let roomId = req.param('room');
 
             core.rooms.get(roomId, function(err, room) {
                 if (err) {
@@ -296,7 +295,7 @@ module.exports = function() {
                     return res.sendStatus(404);
                 }
 
-                var users = core.presence.rooms
+                let users = core.presence.rooms
                         .getOrAdd(room)
                         .getUsers()
                         .map(function(user) {

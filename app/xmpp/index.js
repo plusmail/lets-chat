@@ -8,7 +8,7 @@ const xmpp = require('node-xmpp-server'),
     XmppConnection = require('./xmpp-connection');
 
 const allArray = function(path) {
-        var modules = all(path);
+        let modules = all(path);
         return Object.keys(modules).map(function(key) {
             return modules[key];
         });
@@ -17,7 +17,7 @@ const allArray = function(path) {
     eventListeners = allArray('./events');
 
 function xmppStart(core) {
-    var options = {
+    let options = {
         port: settings.xmpp.port,
         domain: settings.xmpp.domain
     };
@@ -56,8 +56,8 @@ function xmppStart(core) {
         });
 
         client.on('stanza', function(stanza) {
-            var handled = msgProcessors.some(function(Processor) {
-                var processor = new Processor(client, stanza, core);
+            let handled = msgProcessors.some(function(Processor) {
+                let processor = new Processor(client, stanza, core);
                 return processor.run();
             });
 
@@ -75,7 +75,7 @@ function xmppStart(core) {
                 return;
             }
 
-            var msg = new IQ({
+            let msg = new IQ({
                 type: 'error',
                 id: stanza.attrs.id,
                 to: stanza.attrs.from,

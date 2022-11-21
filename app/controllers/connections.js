@@ -4,24 +4,24 @@
 
 'use strict';
 
-module.exports = function() {
+module.exports = function () {
 
-    var app = this.app,
+    const app = this.app,
         core = this.core,
         middlewares = this.middlewares;
 
     //
     // Routes
     //
-    app.get('/connections', middlewares.requireLogin, function(req) {
+    app.get('/connections', middlewares.requireLogin, function (req) {
         req.io.route('connections:list');
     });
 
-    app.get('/connections/type/:type', middlewares.requireLogin, function(req) {
+    app.get('/connections/type/:type', middlewares.requireLogin, function (req) {
         req.io.route('connections:list');
     });
 
-    app.get('/connections/user/:user', middlewares.requireLogin, function(req) {
+    app.get('/connections/user/:user', middlewares.requireLogin, function (req) {
         req.io.route('connections:list');
     });
 
@@ -29,8 +29,8 @@ module.exports = function() {
     // Sockets
     //
     app.io.route('connections', {
-        list: function(req, res) {
-            var query = {};
+        list: function (req, res) {
+            let query = {};
 
             if (req.param('type')) {
                 query.type = req.param('type');
@@ -40,7 +40,7 @@ module.exports = function() {
                 query.user = req.param('user');
             }
 
-            var connections = core.presence.system.connections.query(query);
+            let connections = core.presence.system.connections.query(query);
             res.json(connections);
         }
     });

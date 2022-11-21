@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('lodash'),
+const _ = require('lodash'),
     mongoose = require('mongoose'),
     helpers = require('./helpers');
 
@@ -9,7 +9,7 @@ function MessageManager(options) {
 }
 
 MessageManager.prototype.create = function(options, cb) {
-    var Message = mongoose.model('Message'),
+    let Message = mongoose.model('Message'),
         Room = mongoose.model('Room'),
         User = mongoose.model('User');
 
@@ -18,7 +18,7 @@ MessageManager.prototype.create = function(options, cb) {
     }
 
     Room.findById(options.room, function(err, room) {
-        if (err) {
+        if(err){
             console.error(err);
             return cb(err);
         }
@@ -55,7 +55,7 @@ MessageManager.prototype.create = function(options, cb) {
 };
 
 MessageManager.prototype.list = function(options, cb) {
-    var Room = mongoose.model('Room');
+    let Room = mongoose.model('Room');
 
     options = options || {};
 
@@ -71,9 +71,9 @@ MessageManager.prototype.list = function(options, cb) {
         maxTake: 5000
     });
 
-    var Message = mongoose.model('Message');
+    let Message = mongoose.model('Message');
 
-    var find = Message.find({
+    let find = Message.find({
         room: options.room
     });
 
@@ -94,7 +94,7 @@ MessageManager.prototype.list = function(options, cb) {
     }
 
     if (options.expand) {
-        var includes = options.expand.replace(/\s/, '').split(',');
+        let includes = options.expand.replace(/\s/, '').split(',');
 
         if (_.includes(includes, 'owner')) {
             find.populate('owner', 'id username displayName email avatar');
@@ -121,7 +121,7 @@ MessageManager.prototype.list = function(options, cb) {
             return cb(err);
         }
 
-        var opts = {
+        let opts = {
             userId: options.userId,
             password: options.password
         };

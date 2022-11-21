@@ -1,7 +1,7 @@
 'use strict';
+const config = require('config-yml').load('development')
 
-var settings = require('./../config'),
-    _ = require('lodash'),
+const    _ = require('lodash'),
     util = require('util');
 
 
@@ -13,7 +13,7 @@ function EventListener(core) {
 }
 
 EventListener.prototype.getConnectionsForRoom = function(roomId) {
-    var room = this.core.presence.rooms.get(roomId);
+    let room = this.core.presence.rooms.get(roomId);
 
     if (!room) {
         return [];
@@ -23,7 +23,7 @@ EventListener.prototype.getConnectionsForRoom = function(roomId) {
 };
 
 EventListener.prototype.send = function() {
-    var connection = arguments[0],
+    let connection = arguments[0],
         msgs = Array.prototype.slice.call(arguments, 1);
 
     msgs = _.flatten(msgs);
@@ -37,7 +37,7 @@ EventListener.prototype.send = function() {
 };
 
 EventListener.extend = function(options) {
-    var listener = function() {
+    let listener = function() {
         EventListener.apply(this, arguments);
         this.then = this.then.bind(this);
     };
@@ -49,5 +49,7 @@ EventListener.extend = function(options) {
 
     return listener;
 };
+
+console.log("event-1111->", EventListener);
 
 module.exports = EventListener;

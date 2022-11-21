@@ -78,10 +78,10 @@ function setup(app, session, core) {
         passport: passport
     });
 
-    var psiAuth = passportSocketIo.authorize(session);
+    let psiAuth = passportSocketIo.authorize(session);
 
     app.io.use(function (socket, next) {
-        var User = mongoose.model('User');
+        let User = mongoose.model('User');
         if (socket.request._query && socket.request._query.token) {
             User.findByToken(socket.request._query.token, function(err, user) {
                 if (err || !user) {
@@ -120,12 +120,12 @@ function wrapAuthCallback(username, cb) {
                 };
             }
 
-            var attempt = loginAttempts[username];
+            let attempt = loginAttempts[username];
 
             attempt.attempts++;
 
             if (attempt.attempts >= config.auth.throttling.threshold) {
-                var lock = Math.min(5000 * Math.pow(2, (attempt.attempts - settings.auth.throttling.threshold), MAX_AUTH_DELAY_TIME));
+                let lock = Math.min(5000 * Math.pow(2, (attempt.attempts - settings.auth.throttling.threshold), MAX_AUTH_DELAY_TIME));
                 attempt.lockedUntil = Date.now() + lock;
                 return cb(err, user, {
                     locked: true,

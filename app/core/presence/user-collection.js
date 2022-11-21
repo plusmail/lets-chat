@@ -9,10 +9,9 @@ class UserCollection extends EventEmitter{
         super();
         this.core = options.core;
         this.users = {};
-
-        // this.get = this.get.bind(this);
-        // this.getOrAdd = this.getOrAdd.bind(this);
-        // this.remove = this.remove.bind(this);
+        this.get = this.get.bind(this);
+        this.getOrAdd = this.getOrAdd.bind(this);
+        this.remove = this.remove.bind(this);
     }
     get(userId) {
         return this.users[userId];

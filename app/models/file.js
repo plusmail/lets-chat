@@ -1,10 +1,10 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema,
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
-var FileSchema = new Schema({
+const FileSchema = new Schema({
     room: {
         type: ObjectId,
         ref: 'Room',

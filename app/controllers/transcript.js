@@ -5,7 +5,7 @@
 'use strict';
 
 module.exports = function() {
-    var app = this.app,
+    const app = this.app,
         core = this.core,
         middlewares = this.middlewares;
 
@@ -13,7 +13,7 @@ module.exports = function() {
     // Routes
     //
     app.get('/transcript', middlewares.requireLogin, function(req, res) {
-        var roomId = req.param('room');
+        let roomId = req.param('room');
         core.rooms.get(roomId, function(err, room) {
             if (err) {
                 console.error(err);

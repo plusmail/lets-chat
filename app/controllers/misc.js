@@ -4,12 +4,12 @@
 
 'use strict';
 
-var path = require('path'),
+const path = require('path'),
     settings = require('./../config');
 
 module.exports = function() {
 
-    var app = this.app;
+    const app = this.app;
 
     //
     // Routes

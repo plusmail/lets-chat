@@ -4,10 +4,10 @@
 
 'use strict';
 
-var mongoose = require('mongoose');
-var ObjectId = mongoose.Schema.Types.ObjectId;
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
-var MessageSchema = new mongoose.Schema({
+const MessageSchema = new mongoose.Schema({
     room: {
         type: ObjectId,
         ref: 'Room',
@@ -35,7 +35,7 @@ MessageSchema.index({ text: 'text', room: 1, posted: -1, _id: 1 });
 // This helps ensure that the client gets
 // data that can be digested properly
 MessageSchema.method('toJSON', function(user) {
-    var data = {
+    let data = {
         id: this._id,
         text: this.text,
         posted: this.posted,

@@ -1,6 +1,6 @@
 'use strict';
 
-var fs = require('fs'),
+const fs = require('fs'),
     _ = require('lodash'),
     async = require('async'),
     onFinished = require('on-finished');
@@ -10,7 +10,7 @@ function cleanupReqFiles(req, cb) {
         return cb();
     }
 
-    var files = _.chain(req.files)
+    let files = _.chain(req.files)
              .map(function(x) { return x; })
              .flatten()
              .value();
@@ -20,7 +20,7 @@ function cleanupReqFiles(req, cb) {
 			if (err || !stats.isFile()) {
                 return callback();
             }
-            
+
             fs.unlink(file.path, function(e) {
                 if (e) {
                     console.error(e);

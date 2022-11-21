@@ -4,12 +4,12 @@
 
 'use strict';
 
-var _ = require('lodash'),
+const _ = require('lodash'),
     settings = require('./../config');
 
 module.exports = function() {
 
-    var app = this.app,
+    const app = this.app,
         core = this.core,
         middlewares = this.middlewares;
 
@@ -20,7 +20,7 @@ module.exports = function() {
 
     core.on('user-messages:new', function(message) {
         _.each(message.users, function(userId) {
-            var connections = core.presence.system.connections.query({
+            let connections = core.presence.system.connections.query({
                 type: 'socket.io', userId: userId.toString()
             });
 
@@ -48,7 +48,7 @@ module.exports = function() {
     //
     app.io.route('user-messages', {
         create: function(req, res) {
-            var options = {
+            let options = {
                     owner: req.user._id,
                     user: req.param('user'),
                     text: req.param('text')
@@ -62,7 +62,7 @@ module.exports = function() {
             });
         },
         list: function(req, res) {
-            var options = {
+            let options = {
                     currentUser: req.user._id,
                     user: req.param('user'),
                     since_id: req.param('since_id'),

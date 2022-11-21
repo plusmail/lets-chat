@@ -1,7 +1,6 @@
 'use strict';
-
-var Stanza = require('node-xmpp-server').Stanza,
-    settings = require('./../config'),
+const config = require('config-yml').load('development')
+const Stanza = require('node-xmpp-server').Stanza,
     _ = require('lodash'),
     util = require('util');
 
@@ -90,7 +89,7 @@ MessageProcessor.prototype.run = function() {
 };
 
 MessageProcessor.prototype.send = function(msgs) {
-    if (settings.xmpp.debug.handled) {
+    if (config.xmpp.debug.handled) {
         console.log(' ');
         console.log(this.request.root().toString().blue);
     }
@@ -98,7 +97,7 @@ MessageProcessor.prototype.send = function(msgs) {
     msgs = _.flatten(msgs);
 
     msgs.forEach(function(msg) {
-        if (settings.xmpp.debug.handled) {
+        if (config.xmpp.debug.handled) {
             console.log(msg.root().toString().green);
         }
         this.client.send(msg);

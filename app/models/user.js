@@ -4,7 +4,7 @@
 
 'use strict';
 
-var bcrypt = require('bcryptjs'),
+const bcrypt = require('bcryptjs'),
     crypto = require('crypto'),
     md5 = require('md5'),
     hash = require('node_hash'),
@@ -13,9 +13,9 @@ var bcrypt = require('bcryptjs'),
     validate = require('mongoose-validate'),
     settings = require('./../config');
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
-var UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     provider: {
         type: String,
         required: true,
@@ -119,7 +119,7 @@ UserSchema.virtual('avatar').get(function() {
 });
 
 UserSchema.pre('save', function(next) {
-    var user = this;
+    let user = this;
     if (!user.isModified('password')) {
         return next();
     }
@@ -134,7 +134,7 @@ UserSchema.pre('save', function(next) {
 });
 
 UserSchema.statics.findByIdentifier = function(identifier, cb) {
-    var opts = {};
+    let opts = {};
 
     if (identifier.toString().match(/^[0-9a-fA-F]{24}$/)) {
         opts.$or = [{_id: identifier}, {username: identifier}];
@@ -153,7 +153,7 @@ UserSchema.methods.generateToken = function(cb) {
     }
 
     crypto.randomBytes(24, function(ex, buf) {
-        var password = buf.toString('hex');
+        let password = buf.toString('hex');
 
         bcrypt.hash(password, 10, function(err, hash) {
             if (err) {
@@ -162,7 +162,7 @@ UserSchema.methods.generateToken = function(cb) {
 
             this.token = hash;
 
-            var userToken = new Buffer(
+            let userToken = new Buffer(
                 this._id.toString() + ':' + password
             ).toString('base64');
 
@@ -178,7 +178,7 @@ UserSchema.statics.findByToken = function(token, cb) {
         return cb(null, null);
     }
 
-    var tokenParts = new Buffer(token, 'base64').toString('ascii').split(':'),
+    let tokenParts = new Buffer(token, 'base64').toString('ascii').split(':'),
         userId = tokenParts[0],
         hash = tokenParts[1];
 
@@ -211,7 +211,7 @@ UserSchema.statics.findByToken = function(token, cb) {
 
 UserSchema.methods.comparePassword = function(password, cb) {
 
-    var local = settings.auth.local,
+    let local = settings.auth.local,
         salt = local && local.salt;
 
     // Legacy password hashes

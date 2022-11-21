@@ -53,18 +53,18 @@ class PresenceManager {
         pRoom.addConnection(connection);
     };
 
-    leave = function (connection, roomId) {
+    leave(connection, roomId) {
         let room = this.rooms.get(roomId);
         if (room) {
             room.removeConnection(connection);
         }
     };
 
-    onJoin = function (data) {
+    onJoin(data) {
         this.core.emit('presence:user_join', data);
     };
 
-    onLeave = function (data) {
+    onLeave(data) {
         this.core.emit('presence:user_leave', data);
     };
 

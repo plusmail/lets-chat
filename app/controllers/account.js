@@ -4,27 +4,27 @@
 
 'use strict';
 
-var _ = require('lodash'),
+const _ = require('lodash'),
     fs = require('fs'),
     psjon = require('./../../package.json'),
     auth = require('./../auth/index'),
     path = require('path'),
     settings = require('./../config');
 
-module.exports = function() {
+module.exports = function () {
 
-    var app = this.app,
+    const app = this.app,
         core = this.core,
         middlewares = this.middlewares;
 
-    core.on('account:update', function(data) {
+    core.on('account:update', function (data) {
         app.io.emit('users:update', data.user);
     });
 
     //
     // Routes
     //
-    app.get('/', middlewares.requireLogin.redirect, function(req, res) {
+    app.get('/', middlewares.requireLogin.redirect, function (req, res) {
         res.render('chat.html', {
             account: req.user,
             settings: settings,
@@ -32,10 +32,10 @@ module.exports = function() {
         });
     });
 
-    app.get('/login', function(req, res) {
-        var imagePath = path.resolve('media/img/photos');
-        var images = fs.readdirSync(imagePath);
-        var image = _.chain(images).filter(function(file) {
+    app.get('/login', function (req, res) {
+        let imagePath = path.resolve('media/img/photos');
+        let images = fs.readdirSync(imagePath);
+        let image = _.chain(images).filter(function (file) {
             return /\.(gif|jpg|jpeg|png)$/i.test(file);
         }).sample().value();
         res.render('login.html', {
@@ -44,36 +44,36 @@ module.exports = function() {
         });
     });
 
-    app.get('/logout', function(req, res ) {
+    app.get('/logout', function (req, res) {
         req.session.destroy();
         res.redirect('/login');
     });
 
-    app.post('/account/login', function(req) {
+    app.post('/account/login', function (req) {
         req.io.route('account:login');
     });
 
-    app.post('/account/register', function(req) {
+    app.post('/account/register', function (req) {
         req.io.route('account:register');
     });
 
-    app.get('/account', middlewares.requireLogin, function(req) {
+    app.get('/account', middlewares.requireLogin, function (req) {
         req.io.route('account:whoami');
     });
 
-    app.post('/account/profile', middlewares.requireLogin, function(req) {
+    app.post('/account/profile', middlewares.requireLogin, function (req) {
         req.io.route('account:profile');
     });
 
-    app.post('/account/settings', middlewares.requireLogin, function(req) {
+    app.post('/account/settings', middlewares.requireLogin, function (req) {
         req.io.route('account:settings');
     });
 
-    app.post('/account/token/generate', middlewares.requireLogin, function(req) {
+    app.post('/account/token/generate', middlewares.requireLogin, function (req) {
         req.io.route('account:generate_token');
     });
 
-    app.post('/account/token/revoke', middlewares.requireLogin, function(req) {
+    app.post('/account/token/revoke', middlewares.requireLogin, function (req) {
         req.io.route('account:revoke_token');
     });
 
@@ -81,12 +81,12 @@ module.exports = function() {
     // Sockets
     //
     app.io.route('account', {
-        whoami: function(req, res) {
+        whoami: function (req, res) {
             res.json(req.user);
         },
 
-        profile: function(req, res) {
-            var form = req.body || req.data,
+        profile: function (req, res) {
+            let form = req.body || req.data,
                 data = {
                     displayName: form.displayName || form['display-name'],
                     firstName: form.firstName || form['first-name'],
@@ -110,16 +110,16 @@ module.exports = function() {
                 res.json(user);
             });
         },
-        settings: function(req, res) {
+        settings: function (req, res) {
             if (req.user.usingToken) {
                 return res.status(403).json({
                     status: 'error',
                     message: 'Cannot change account settings ' +
-                             'when using token authentication.'
+                        'when using token authentication.'
                 });
             }
 
-            var form = req.body || req.data,
+            let form = req.body || req.data,
                 data = {
                     username: form.username,
                     email: form.email,
@@ -131,41 +131,41 @@ module.exports = function() {
                 };
 
             auth.authenticate(req, req.user.uid || req.user.username,
-                              data.currentPassword, function(err, user) {
-                if (err) {
-                    return res.status(400).json({
-                        status: 'error',
-                        message: 'There were problems authenticating you.',
-                        errors: err
-                    });
-                }
-
-                if (!user) {
-                    return res.status(401).json({
-                        status: 'error',
-                        message: 'Incorrect login credentials.'
-                    });
-                }
-
-                core.account.update(req.user._id, data, function (err, user, reason) {
-                    if (err || !user) {
+                data.currentPassword, function (err, user) {
+                    if (err) {
                         return res.status(400).json({
                             status: 'error',
-                            message: 'Unable to update your account.',
-                            reason: reason,
+                            message: 'There were problems authenticating you.',
                             errors: err
                         });
                     }
-                    res.json(user);
+
+                    if (!user) {
+                        return res.status(401).json({
+                            status: 'error',
+                            message: 'Incorrect login credentials.'
+                        });
+                    }
+
+                    core.account.update(req.user._id, data, function (err, user, reason) {
+                        if (err || !user) {
+                            return res.status(400).json({
+                                status: 'error',
+                                message: 'Unable to update your account.',
+                                reason: reason,
+                                errors: err
+                            });
+                        }
+                        res.json(user);
+                    });
                 });
-            });
         },
-        generate_token: function(req, res) {
+        generate_token: function (req, res) {
             if (req.user.usingToken) {
                 return res.status(403).json({
                     status: 'error',
                     message: 'Cannot generate a new token ' +
-                             'when using token authentication.'
+                        'when using token authentication.'
                 });
             }
 
@@ -185,12 +185,12 @@ module.exports = function() {
                 });
             });
         },
-        revoke_token: function(req, res) {
+        revoke_token: function (req, res) {
             if (req.user.usingToken) {
                 return res.status(403).json({
                     status: 'error',
                     message: 'Cannot revoke token ' +
-                             'when using token authentication.'
+                        'when using token authentication.'
                 });
             }
 
@@ -209,7 +209,7 @@ module.exports = function() {
                 });
             });
         },
-        register: function(req, res) {
+        register: function (req, res) {
 
             if (req.user ||
                 !auth.providers.local ||
@@ -221,10 +221,10 @@ module.exports = function() {
                 });
             }
 
-            var fields = req.body || req.data;
+            let fields = req.body || req.data;
 
             // Sanity check the password
-            var passwordConfirm = fields.passwordConfirm || fields.passwordconfirm || fields['password-confirm'];
+            let passwordConfirm = fields.passwordConfirm || fields.passwordconfirm || fields['password-confirm'];
 
             if (fields.password !== passwordConfirm) {
                 return res.status(400).json({
@@ -233,7 +233,7 @@ module.exports = function() {
                 });
             }
 
-            var data = {
+            let data = {
                 provider: 'local',
                 username: fields.username,
                 email: fields.email,
@@ -243,19 +243,19 @@ module.exports = function() {
                 displayName: fields.displayName || fields.displayname || fields['display-name']
             };
 
-            core.account.create('local', data, function(err) {
+            core.account.create('local', data, function (err) {
                 if (err) {
-                    var message = 'Sorry, we could not process your request';
+                    let message = 'Sorry, we could not process your request';
                     // User already exists
                     if (err.code === 11000) {
                         message = 'Email has already been taken';
                     }
                     // Invalid username
                     if (err.errors) {
-                        message = _.map(err.errors, function(error) {
+                        message = _.map(err.errors, function (error) {
                             return error.message;
                         }).join(' ');
-                    // If all else fails...
+                        // If all else fails...
                     } else {
                         console.error(err);
                     }
@@ -269,12 +269,12 @@ module.exports = function() {
                 res.status(201).json({
                     status: 'success',
                     message: 'You\'ve been registered, ' +
-                             'please try logging in now!'
+                        'please try logging in now!'
                 });
             });
         },
-        login: function(req, res) {
-            auth.authenticate(req, function(err, user, info) {
+        login: function (req, res) {
+            auth.authenticate(req, function (err, user, info) {
                 if (err) {
                     return res.status(400).json({
                         status: 'error',
@@ -294,11 +294,11 @@ module.exports = function() {
                     return res.status(401).json({
                         status: 'error',
                         message: info && info.message ||
-                                 'Incorrect login credentials.'
+                            'Incorrect login credentials.'
                     });
                 }
 
-                req.login(user, function(err) {
+                req.login(user, function (err) {
                     if (err) {
                         return res.status(400).json({
                             status: 'error',
@@ -306,8 +306,8 @@ module.exports = function() {
                             errors: err
                         });
                     }
-                    var temp = req.session.passport;
-                    req.session.regenerate(function(err) {
+                    let temp = req.session.passport;
+                    req.session.regenerate(function (err) {
                         if (err) {
                             return res.status(400).json({
                                 status: 'error',

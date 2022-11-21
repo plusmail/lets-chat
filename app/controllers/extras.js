@@ -6,13 +6,13 @@
 
 module.exports = function() {
 
-    var _ = require('lodash'),
+    const _ = require('lodash'),
         fs = require('fs'),
         path = require('path'),
         yaml = require('js-yaml'),
         express = require('express.oi');
 
-    var app = this.app,
+    const app = this.app,
         middlewares = this.middlewares;
 
     //
@@ -37,32 +37,32 @@ module.exports = function() {
     //
     app.io.route('extras', {
         'emotes:list': function(req, res) {
-            var emotes = [];
+            let emotes = [];
 
-            var dir = path.join(process.cwd(), 'extras/emotes');
+            let dir = path.join(process.cwd(), 'extras/emotes');
             fs.readdir(dir, function(err, files) {
                 if (err) {
                     return res.json(emotes);
                 }
 
-                var regex = new RegExp('\\.yml$');
+                let regex = new RegExp('\\.yml$');
 
                 files = files.filter(function(fileName) {
                     return regex.test(fileName);
                 });
 
                 files.forEach(function(fileName) {
-                    var fullpath = path.join(
+                    let fullpath = path.join(
                         process.cwd(),
                         'extras/emotes',
                         fileName
                     );
 
-                    var imgDir = 'extras/emotes/' +
+                    let imgDir = 'extras/emotes/' +
                         fileName.replace('.yml', '') + '/';
 
-                    var file = fs.readFileSync(fullpath, 'utf8');
-                    var data = yaml.safeLoad(file);
+                    let file = fs.readFileSync(fullpath, 'utf8');
+                    let data = yaml.safeLoad(file);
                     _.each(data, function(emote) {
                         emote.image = imgDir + emote.image;
                         emotes.push(emote);
@@ -73,9 +73,9 @@ module.exports = function() {
             });
         },
         'replacements:list': function(req, res) {
-            var replacements = [];
+            let replacements = [];
             ['default.yml', 'local.yml'].forEach(function(filename) {
-                var fullpath = path.join(process.cwd(), 'extras/replacements/' + filename);
+                let fullpath = path.join(process.cwd(), 'extras/replacements/' + filename);
                 if (fs.existsSync(fullpath)) {
                     replacements = _.merge(replacements, yaml.safeLoad(fs.readFileSync(fullpath, 'utf8')));
                 }

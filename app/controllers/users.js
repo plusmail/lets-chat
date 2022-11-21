@@ -6,7 +6,7 @@
 
 module.exports = function() {
 
-    var app = this.app,
+    const app = this.app,
         core = this.core,
         middlewares = this.middlewares,
         models = this.models,
@@ -28,7 +28,7 @@ module.exports = function() {
     //
     app.io.route('users', {
         list: function(req, res) {
-            var options = {
+            let options = {
                     skip: req.param('skip'),
                     take: req.param('take')
                 };
@@ -43,7 +43,7 @@ module.exports = function() {
             });
         },
         get: function(req, res) {
-            var identifier = req.param('id');
+            let identifier = req.param('id');
 
             User.findByIdentifier(identifier, function (err, user) {
                 if (err) {

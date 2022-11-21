@@ -4,13 +4,13 @@
 
 'use strict';
 
-var mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
     uniqueValidator = require('mongoose-unique-validator'),
     bcrypt = require('bcryptjs');
 
-var ObjectId = mongoose.Schema.Types.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
-var RoomSchema = new mongoose.Schema({
+const RoomSchema = new mongoose.Schema({
     slug: {
         type: String,
         required: true,
@@ -72,7 +72,7 @@ RoomSchema.virtual('hasPassword').get(function() {
 });
 
 RoomSchema.pre('save', function(next) {
-    var room = this;
+    let room = this;
     if (!room.password || !room.isModified('password')) {
         return next();
     }
@@ -128,7 +128,7 @@ RoomSchema.method('isAuthorized', function(userId) {
 });
 
 RoomSchema.method('canJoin', function(options, cb) {
-    var userId = options.userId,
+    let userId = options.userId,
         password = options.password,
         saveMembership = options.saveMembership;
 
@@ -167,16 +167,16 @@ RoomSchema.method('canJoin', function(options, cb) {
 });
 
 RoomSchema.method('toJSON', function(user) {
-    var userId = user ? (user._id || user.id || user) : null;
-    var authorized = false;
+    let userId = user ? (user._id || user.id || user) : null;
+    let authorized = false;
 
     if (userId) {
         authorized = this.isAuthorized(userId);
     }
 
-    var room = this.toObject();
+    let room = this.toObject();
 
-    var data = {
+    let data = {
         id: room._id,
         slug: room.slug,
         name: room.name,
@@ -190,7 +190,7 @@ RoomSchema.method('toJSON', function(user) {
     };
 
     if (room.private && authorized) {
-        var participants = this.participants || [];
+        let participants = this.participants || [];
         data.participants = participants.map(function(user) {
             return user.username ? user.username : user;
         });
@@ -205,7 +205,7 @@ RoomSchema.method('toJSON', function(user) {
  });
 
 RoomSchema.statics.findByIdOrSlug = function(identifier, cb) {
-    var opts = {
+    let opts = {
         archived: { $ne: true }
     };
 
